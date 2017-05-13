@@ -3,12 +3,12 @@ kind: Service
 metadata:
   name: django-app-svc
   labels:
-    app: django-app  
+    app: django-app
 spec:
   ports:
   - port: 80
     targetPort: 8000
     protocol: TCP
   selector:
-    name: django-app
+    app: django-app
   type: LoadBalancer
