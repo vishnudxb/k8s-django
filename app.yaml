@@ -1,0 +1,80 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: django-app
+  labels:
+    app: django-app
+spec:
+  revisionHistoryLimit: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 2
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: django-app
+    spec:
+      containers:
+      - name: django-app
+        #image: docker-registry.fetchr-test.com/django:v1
+        image: 169624296835.dkr.ecr.us-east-1.amazonaws.com/django-app:v1
+        env:
+          - name: MY_POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: MY_POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: MY_POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          - name: DATABASE_NAME
+            valueFrom:
+             secretKeyRef:
+              name: db-secrets
+              key: DATABASE_NAME
+          - name: DATABASE_USER
+            valueFrom:
+             secretKeyRef:
+              name: db-secrets
+              key: DATABASE_USER
+          - name: DATABASE_PASSWORD
+            valueFrom:
+             secretKeyRef:
+              name: db-secrets
+              key: DATABASE_PASSWORD
+          - name: DATABASE_SERVICE_HOST
+            valueFrom:
+             secretKeyRef:
+              name: db-secrets
+              key: DATABASE_SERVICE_HOST
+          - name: DATABASE_SERVICE_PORT
+            valueFrom:
+             secretKeyRef:
+              name: db-secrets
+              key: DATABASE_SERVICE_PORT
+        ports:
+          - containerPort: 8000
+        resources:
+          requests:
+            cpu: 200m
+
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: django-app-autoscaler
+spec:
+  scaleTargetRef:
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    name: django-app
+  minReplicas: 3
+  maxReplicas: 50
+  targetCPUUtilizationPercentage: 50
