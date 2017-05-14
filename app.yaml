@@ -20,7 +20,7 @@ spec:
       containers:
       - name: django-app
         #image: docker-registry.fetchr-test.com/django:v1
-        image: 169624296835.dkr.ecr.us-east-1.amazonaws.com/django-app:v1
+        image: 169624296835.dkr.ecr.us-east-1.amazonaws.com/django-app:v2
         env:
           - name: MY_POD_NAME
             valueFrom:
