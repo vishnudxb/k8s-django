@@ -11,6 +11,8 @@ spec:
       name: jenkins-master
   selector:
     name: jenkins-app
+  type: LoadBalancer
+  
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
